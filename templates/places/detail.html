@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ place.name }} — Aawaaragardi HSR{% endblock %}
+
+{% block content %}
+<div class="detail-wrap wrap">
+  <a href="{% url 'feed' %}" class="back-link">&larr; Back to the scrapbook</a>
+
+  <article class="detail-spread">
+    <!-- Full gallery -->
+    <div class="detail-gallery">
+      {% for photo in place.photos.all %}
+      <div class="detail-photo" style="background-image:url('{{ photo.image.url }}');transform:rotate({{ forloop.counter|add:"-1" }}deg)">
+        <span class="tape {% cycle 't' 'm' '' %}"></span>
+        {% if photo.caption %}<span class="cap">{{ photo.caption }}</span>{% endif %}
+      </div>
+      {% empty %}
+      <div class="detail-photo photo-placeholder" style="height:280px;font-size:4rem;display:flex;align-items:center;justify-content:center">
+        {% if place.type == 'cafe' %}☕{% elif place.type == 'thela' %}🛒{% elif place.type == 'garden' %}🌳{% else %}📍{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Info -->
+    <div class="detail-info">
+      {% if not place.is_on_google %}
+        <span class="badge notgoogle">not on google &#x2717;</span>
+      {% else %}
+        <span class="badge cafe">{{ place.get_type_display }}</span>
+      {% endif %}
+
+      <h1 class="detail-title">{{ place.name }}</h1>
+
+      <div class="where">
+        {% if place.sector %}&#128205; {{ place.sector }}{% if place.location_text %} &middot; {% endif %}{% endif %}
+        {% if place.location_text %}{{ place.location_text }}{% endif %}
+        {% if place.timings_text %} &middot; {{ place.timings_text }}{% endif %}
+      </div>
+
+      <p class="detail-caption">{{ place.caption }}</p>
+
+      <div class="detail-meta-block">
+        {% if place.price_text %}
+        <div class="meta-item">
+          <span class="meta-icon">&#128178;</span>
+          <span>{{ place.price_text }}</span>
+        </div>
+        {% endif %}
+        {% if place.vibe_tag %}
+        <div class="meta-item">
+          <span class="meta-icon">{{ place.vibe_icon }}</span>
+          <span>{{ place.get_vibe_tag_display }}</span>
+        </div>
+        {% endif %}
+        {% if place.timings_text %}
+        <div class="meta-item">
+          <span class="meta-icon">&#128336;</span>
+          <span>{{ place.timings_text }}</span>
+        </div>
+        {% endif %}
+        {% if place.practical_notes %}
+        <div class="meta-item practical-detail">
+          <span class="meta-icon">&#9888;&#65039;</span>
+          <span>{{ place.practical_notes }}</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </article>
+</div>
+{% endblock %}

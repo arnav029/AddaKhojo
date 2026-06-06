@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Aawaaragardi HSR — Every corner, documented{% endblock %}
+
+{% block content %}
+<header>
+  <svg class="hero-doodle arrow-1" viewBox="0 0 120 80" aria-hidden="true"><path d="M5 70 Q40 75 60 40 Q70 22 95 18" fill="none" stroke="#1F9E8C" stroke-width="2.5" stroke-dasharray="2 7" stroke-linecap="round"/><path d="M95 18 L82 14 M95 18 L88 30" fill="none" stroke="#1F9E8C" stroke-width="2.5" stroke-linecap="round"/></svg>
+  <svg class="hero-doodle arrow-2" viewBox="0 0 140 80" aria-hidden="true"><path d="M5 60 Q50 80 80 40 Q98 16 130 20" fill="none" stroke="#E8503A" stroke-width="2.5" stroke-dasharray="2 7" stroke-linecap="round"/><path d="M130 20 L116 14 M130 20 L122 33" fill="none" stroke="#E8503A" stroke-width="2.5" stroke-linecap="round"/></svg>
+  <svg class="hero-doodle star-1" viewBox="0 0 50 50" aria-hidden="true"><path d="M25 2 L30 20 L48 25 L30 30 L25 48 L20 30 L2 25 L20 20 Z" fill="#F2B23E" stroke="#2B2722" stroke-width="2" stroke-linejoin="round"/></svg>
+  <svg class="hero-doodle star-2" viewBox="0 0 50 50" aria-hidden="true"><path d="M25 2 L30 20 L48 25 L30 30 L25 48 L20 30 L2 25 L20 20 Z" fill="#1F9E8C" stroke="#2B2722" stroke-width="2" stroke-linejoin="round"/></svg>
+  <div class="wrap">
+    <span class="kicker reveal d1">a love-letter to the gallis of</span>
+    <h1 class="reveal d2">Aawaaragardi <span class="hsr">HSR</span></h1>
+    <svg class="squiggle reveal d2" viewBox="0 0 420 18" aria-hidden="true"><path d="M3 12 Q60 2 110 10 T220 9 T330 11 T417 8" fill="none" stroke="#E8503A" stroke-width="4" stroke-linecap="round"/></svg>
+    <p class="tag reveal d3">The egg-roll cart Google's never heard of. The garden bench only locals know. <b>Every corner of HSR Layout — documented, photographed, and reviewed with zero filter.</b></p>
+    <div class="cta reveal d4">
+      <a href="#feed" class="btn red">Explore the spots &rarr;</a>
+    </div>
+    <div class="place-count reveal d4">
+      <span class="count-num">{{ places|length }}</span>
+      <span class="count-label">places documented</span>
+    </div>
+  </div>
+</header>
+
+<section id="feed">
+  <div class="wrap">
+    <div class="s-head">
+      <span class="s-num">HSR</span>
+      <span class="s-title">The scrapbook</span>
+      <span class="s-note">all photos, no clicking &there4;</span>
+    </div>
+
+    {% for place in places %}
+    {% with photos=place.photos.all photo_count=place.photos.count %}
+    <div class="spread {% if forloop.counter|divisibleby:2 %}flip{% endif %}" data-place-id="{{ place.id }}">
+
+      <!-- PHOTO GALLERY -->
+      <div class="gallery gallery-count-{{ photo_count|default:0 }}">
+        {% if photo_count == 0 %}
+          <div class="photo p-a photo-placeholder">
+            {% if place.type == 'cafe' %}☕{% elif place.type == 'thela' %}🛒{% elif place.type == 'garden' %}🌳{% elif place.type == 'restaurant' %}🍽️{% elif place.type == 'shop' %}🛍️{% else %}📍{% endif %}
+          </div>
+        {% elif photo_count == 1 %}
+          {% with photo=photos.0 %}
+          <div class="photo p-a photo-single" style="background-image:url('{{ photo.image.url }}')">
+            <span class="tape t"></span>
+            {% if photo.caption %}<span class="cap">{{ photo.caption }}</span>{% endif %}
+          </div>
+          {% endwith %}
+        {% elif photo_count == 2 %}
+          {% with pa=photos.0 pb=photos.1 %}
+          <div class="photo p-a photo-duo-a" style="background-image:url('{{ pa.image.url }}')">
+            <span class="tape"></span>
+            {% if pa.caption %}<span class="cap">{{ pa.caption }}</span>{% endif %}
+          </div>
+          <div class="photo p-b photo-duo-b" style="background-image:url('{{ pb.image.url }}')">
+            {% if pb.caption %}<span class="cap">{{ pb.caption }}</span>{% endif %}
+          </div>
+          {% endwith %}
+        {% else %}
+          {% with pa=photos.0 pb=photos.1 pc=photos.2 %}
+          <div class="photo p-a" style="background-image:url('{{ pa.image.url }}')">
+            <span class="tape t"></span>
+            {% if pa.caption %}<span class="cap">{{ pa.caption }}</span>{% endif %}
+          </div>
+          <div class="photo p-b" style="background-image:url('{{ pb.image.url }}')">
+            {% if pb.caption %}<span class="cap">{{ pb.caption }}</span>{% endif %}
+          </div>
+          <div class="photo p-c" style="background-image:url('{{ pc.image.url }}')">
+            <span class="tape m"></span>
+            {% if pc.caption %}<span class="cap">{{ pc.caption }}</span>{% endif %}
+          </div>
+          {% if photo_count > 3 %}
+          <button class="more-photos-btn" data-extra-count="{{ photo_count|add:'-3' }}" aria-expanded="false">
+            + {{ photo_count|add:"-3" }} more photos &darr;
+          </button>
+          {% endif %}
+          {% endwith %}
+
+          {% if photo_count > 3 %}
+          <div class="extra-photos" hidden>
+            {% for photo in photos %}
+            {% if forloop.counter > 3 %}
+            <div class="photo extra-photo" style="background-image:url('{{ photo.image.url }}')">
+              {% if photo.caption %}<span class="cap">{{ photo.caption }}</span>{% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <!-- INFO PANEL -->
+      <div class="info">
+        {% if not place.is_on_google %}
+          <span class="badge notgoogle">not on google &#x2717;</span>
+        {% elif place.type == 'cafe' %}
+          <span class="badge cafe">caf&eacute; &middot; listed</span>
+        {% elif place.type == 'garden' %}
+          <span class="badge green">secret spot &#x1F92B;</span>
+        {% elif place.type == 'thela' %}
+          <span class="badge thela">street cart</span>
+        {% else %}
+          <span class="badge type-{{ place.type }}">{{ place.get_type_display }}</span>
+        {% endif %}
+
+        <h3><a href="{% url 'place_detail' place.slug %}" class="place-link">{{ place.name }}</a></h3>
+
+        <div class="where">
+          {% if place.sector %}&#128205; {{ place.sector }}{% if place.location_text %} &middot; {% endif %}{% endif %}
+          {% if place.location_text %}{{ place.location_text }}{% endif %}
+          {% if place.timings_text %} &middot; {{ place.timings_text }}{% endif %}
+        </div>
+
+        <p class="caption">{{ place.caption }}</p>
+
+        <div class="meta">
+          {% if place.price_text %}<span>&#128178; {{ place.price_text }}</span>{% endif %}
+          {% if place.vibe_tag %}<span>{{ place.vibe_icon }} {{ place.get_vibe_tag_display }}</span>{% endif %}
+          {% if place.practical_notes %}<span class="practical">{{ place.practical_notes }}</span>{% endif %}
+        </div>
+
+        <a href="{% url 'place_detail' place.slug %}" class="view-more-link">See full spread &rarr;</a>
+      </div>
+    </div>
+    {% endwith %}
+    {% empty %}
+    <div class="empty-state">
+      <p class="empty-hand">No places yet — the scrapbook is waiting ✍️</p>
+      <p>Add your first spot via the <a href="/admin/">admin panel</a>.</p>
+    </div>
+    {% endfor %}
+
+  </div>
+</section>
+{% endblock %}
